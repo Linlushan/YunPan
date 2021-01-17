@@ -1,6 +1,6 @@
 {
-    let topId = 4000;//顶层id
-    let nowId = 4000;//当前项id
+    let topId = 2;//顶层id
+    let nowId = 2999;//当前项id
 
     console.log(getAllParent(topId));
 
@@ -35,8 +35,8 @@
     let folders = document.querySelector('#folders')
 
     //路径导航渲染
-    breadNav.innerHTML = reanderzBreadMenu()
-    function reanderzBreadMenu() {
+    breadNav.innerHTML = reanderBreadMenu()
+    function reanderBreadMenu() {
         let nowSelf = getSelf(nowId)
         let allParent = getAllParent(nowId)
         let inner = ''
@@ -44,6 +44,27 @@
             inner += `<a herf = '#'>${item.title}</a>`
         });
         inner += `<span>${nowSelf.title}</span>`
+        return inner
+    }
+
+    //文件夹视图渲染
+    folders.innerHTML = reanderFolders()
+    function reanderFolders() {
+        let child = getChild(nowId)
+        let inner = ''
+        child.forEach(item => {
+            inner += `
+                <li class="folder-item">
+                    <img src="img/folder-b.png" alt="">
+                    <span class="folder-name">${item.title}</span>
+                    <input type="text" class="editor" value="${item.title}">
+                    <label class="checked">
+                        <input type="checkbox" />
+                        <span class="iconfont icon-checkbox-checked"></span>
+                    </label>   
+                </li>
+            `
+        })
         return inner
     }
 }
