@@ -35,28 +35,32 @@
     let breadNav = document.querySelector('.bread-nav')
     let folders = document.querySelector('#folders')
 
-    //树状菜单渲染
-    treeMenu.innerHTML = reanderTreeMenu(-1, 0)
-    function reanderTreeMenu(pid, level) {
-        let child = getChild(pid)
-        let nowAllParent = getAllParent(nowId)
-        nowAllParent.push(getSelf(nowId))
-        // console.log(level);
+    /* 树状菜单的渲染 */
+    treeMenu.innerHTML = renderTreeMenu(-1, 0)
+    function renderTreeMenu(pid, level) {
+        let child = getChild(pid);
+        let nowAllParent = getAllParent(nowId);
+        nowAllParent.push(getSelf(nowId));
         let inner = `
-            <ul>
-                ${child.map(item => {
-            let itemChlid = getChild(item.id)
+        <ul>
+            ${child.map(item => {
+            let itemChild = getChild(item.id);
             return `
-                        <li class="${nowAllParent.includes(item) ? 'open' : ''}">
-                            <p data-id = '${item.id}' style="padding-left:${40 + level * 20}px" class="${itemChlid.length ? 'has-child' : ''} ${item.id == nowId ? 'active' : ''} "><span>${item.title}</span></p>
-                        </li>
-                        ${itemChlid.length ? reanderTreeMenu(item.id, level + 1) : ''}
-                        `
-        }).join('')}   
-            </ul>
-        `
-        // console.log(inner);
-        return inner
+                    <li class="${nowAllParent.includes(item) ? "open" : ""}">
+                        <p 
+                            style="padding-left:${40 + level * 20}px" 
+                            class="${itemChild.length ? "has-child" : ""} ${item.id == nowId ? "active" : ""}"
+                            data-id="${item.id}"
+                        >
+                            <span>${item.title}</span>
+                        </p>
+                        ${itemChild.length ? renderTreeMenu(item.id, level + 1) : ""}
+                    </li>
+                `
+        }).join("")}
+        </ul>
+    `;
+        return inner;
     }
 
     //路径导航渲染
