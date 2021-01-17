@@ -1,6 +1,7 @@
 {
-    let topId = 2;//顶层id
-    let nowId = 2999;//当前项id
+    let topPid = -1;//顶层pid
+    let topId = 1;//顶层id
+    let nowId = 0;//当前项id
 
     console.log(getAllParent(topId));
 
@@ -34,6 +35,30 @@
     let breadNav = document.querySelector('.bread-nav')
     let folders = document.querySelector('#folders')
 
+    //树状菜单渲染
+    treeMenu.innerHTML = reanderTreeMenu(-1, 0)
+    function reanderTreeMenu(pid, level) {
+        let child = getChild(pid)
+        let nowAllParent = getAllParent(nowId)
+        nowAllParent.push(getSelf(nowId))
+        // console.log(level);
+        let inner = `
+            <ul>
+                ${child.map(item => {
+            let itemChlid = getChild(item.id)
+            return `
+                        <li class="${nowAllParent.includes(item) ? 'open' : ''}">
+                            <p data-id = '${item.id}' style="padding-left:${40 + level * 20}px" class="${itemChlid.length ? 'has-child' : ''} ${item.id == nowId ? 'active' : ''} "><span>${item.title}</span></p>
+                        </li>
+                        ${itemChlid.length ? reanderTreeMenu(item.id, level + 1) : ''}
+                        `
+        }).join('')}   
+            </ul>
+        `
+        // console.log(inner);
+        return inner
+    }
+
     //路径导航渲染
     breadNav.innerHTML = reanderBreadMenu()
     function reanderBreadMenu() {
@@ -41,7 +66,7 @@
         let allParent = getAllParent(nowId)
         let inner = ''
         allParent.forEach(item => {
-            inner += `<a herf = '#'>${item.title}</a>`
+            inner += `<a data-id=${item.id} herf = '#'>${item.title}</a>`
         });
         inner += `<span>${nowSelf.title}</span>`
         return inner
@@ -54,7 +79,7 @@
         let inner = ''
         child.forEach(item => {
             inner += `
-                <li class="folder-item">
+                <li data-id='${item.id}' class="folder-item">
                     <img src="img/folder-b.png" alt="">
                     <span class="folder-name">${item.title}</span>
                     <input type="text" class="editor" value="${item.title}">
