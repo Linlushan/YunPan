@@ -1,5 +1,6 @@
 {
-    let topId = 4000;
+    let topId = 4000;//顶层id
+    let nowId = 4000;//当前项id
 
     console.log(getAllParent(topId));
 
@@ -26,5 +27,23 @@
             parent = getParent(parent.id)
         }
         return allParent
+    }
+
+    //视图渲染
+    let treeMenu = document.querySelector('#tree-menu')
+    let breadNav = document.querySelector('.bread-nav')
+    let folders = document.querySelector('#folders')
+
+    //路径导航渲染
+    breadNav.innerHTML = reanderzBreadMenu()
+    function reanderzBreadMenu() {
+        let nowSelf = getSelf(nowId)
+        let allParent = getAllParent(nowId)
+        let inner = ''
+        allParent.forEach(item => {
+            inner += `<a herf = '#'>${item.title}</a>`
+        });
+        inner += `<span>${nowSelf.title}</span>`
+        return inner
     }
 }
