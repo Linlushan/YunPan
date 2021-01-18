@@ -42,6 +42,27 @@
         breadNav.innerHTML = reanderBreadMenu()
         folders.innerHTML = reanderFolders()
     }
+    //根据当前项id获取所有子级
+
+    function getAllChild(id) {
+        let child = getChild(id)
+        arrChild = []
+        if (child.length > 0) {
+            arrChild = arrChild.concat(child)
+            child.forEach(item => {
+                arrChild = arrChild.concat(getChild(item.id))
+            })
+        }
+        return arrChild
+    }
+    //删除数据当前项方法
+    function removeData(id) {
+        let remove = getAllChild(id)
+        remove.push(getSelf(id))
+        data = data.filter(item => !remove.includes(item))
+        console.log(data);
+    }
+
     //弹窗公共方法
     //成功弹窗
     function alertSuccess(info) {
@@ -209,10 +230,16 @@
     //右键菜单
     //阻止系统默认行为
     document.addEventListener('contextmenu', function (e) {
-
-        contextmenu.style.display = 'none'
         e.preventDefault();
-
+    })
+    window.addEventListener('mousedown', function (e) {
+        contextmenu.style.display = 'none'
+    })
+    window.addEventListener('resize', function (e) {
+        contextmenu.style.display = 'none'
+    })
+    window.addEventListener('scorll', function (e) {
+        contextmenu.style.display = 'none'
     })
     //右键添加事件
     let contextmenu = document.querySelector('#contextmenu')
@@ -237,8 +264,57 @@
             y = Math.min(y, maxY)
             contextmenu.style.left = x + 'px'
             contextmenu.style.top = y + 'px'
+            contextmenu.folder = folder
 
         }
         console.log(folder);
+    })
+    //右键菜单单项处理
+    contextmenu.addEventListener('mousedown', function (e) {
+        e.stopPropagation()
+    })
+    contextmenu.addEventListener('click', function (e) {
+        if (e.target.classList.contains('icon-lajitong')) {//右键菜单(删除)
+            console.log('删除', this.folder);
+            removeData(this.folder.dataset.id)
+            render()
+        } else if (e.target.classList.contains('icon-yidong')) {//右键菜单(移动到)
+            console.log('移动到');
+        } else if (e.target.classList.contains('icon-zhongmingming')) {//右键菜单(重命名)
+            console.log('重命名');
+        }
+        contextmenu.style.display = 'none'
+    })
+    //  confirm 控件弹窗
+    let confirmEl = document.querySelector('.confirm')
+    let confirmText = document.querySelector('.confirm-text')
+    let confirmClos = confirmEl.querySelector('.clos')
+    let mask = document.querySelector('#mask')
+    let confirmBtns = confirmEl.querySelectorAll('.confirm-btns a')
+
+    confirm('确定要删除吗', () => {
+        console.log('点击确定了');
+    }, () => {
+        console.log('点击取消了');
+    })
+    function confirm(info, res, rej) {
+        confirmText.innerHTML = info
+        confirmEl.classList.add('confirm-show')
+        mask.style.display = 'block'
+        confirmBtns[0].onclick = function () {
+
+            mask.style.display = 'none'
+            confirmEl.classList.remove('confirm-show')
+            res && res()
+        }
+        confirmBtns[1].onclick = function () {
+            mask.style.display = 'none'
+            confirmEl.classList.remove('confirm-show')
+            rej && rej()
+        }
+    }
+    confirmClos.addEventListener('click', function () {
+        mask.style.display = 'none'
+        confirmEl.classList.remove('confirm-show')
     })
 }
