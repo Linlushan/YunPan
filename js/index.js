@@ -138,5 +138,15 @@
             render()
         }
     })
-
+    //新建文件夹
+    let createBtn = document.querySelector('.create-btn')
+    createBtn.addEventListener('click', function () {
+        data.push(
+            {
+                id: Date.now(),
+                pid: nowId,
+                title: "新建文件夹"
+            })
+            render()
+    })  
 }
