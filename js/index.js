@@ -35,8 +35,16 @@
     let breadNav = document.querySelector('.bread-nav')
     let folders = document.querySelector('#folders')
 
-    /* 树状菜单的渲染 */
-    treeMenu.innerHTML = renderTreeMenu(-1, 0)
+    //视图渲染
+    render()
+    function render() {
+        treeMenu.innerHTML = renderTreeMenu(-1, 0)
+        breadNav.innerHTML = reanderBreadMenu()
+        folders.innerHTML = reanderFolders()
+    }
+
+    //树状菜单的渲染
+
     function renderTreeMenu(pid, level) {
         let child = getChild(pid);
         let nowAllParent = getAllParent(nowId);
@@ -64,7 +72,6 @@
     }
 
     //路径导航渲染
-    breadNav.innerHTML = reanderBreadMenu()
     function reanderBreadMenu() {
         let nowSelf = getSelf(nowId)
         let allParent = getAllParent(nowId)
@@ -77,7 +84,7 @@
     }
 
     //文件夹视图渲染
-    folders.innerHTML = reanderFolders()
+
     function reanderFolders() {
         let child = getChild(nowId)
         let inner = ''
@@ -96,4 +103,40 @@
         })
         return inner
     }
+
+    //三大视图添加事件
+    //树状菜单添加事件
+    treeMenu.addEventListener('click', function (e) {
+        let item = ''
+        item = e.target.tagName == 'SPAN' ? e.target.parentNode : e.target
+        if (item.tagName == 'P') {
+            console.log(item.dataset.id);
+            nowId = item.dataset.id
+            render()
+        }
+    })
+
+    //路径导航添加事件
+    breadNav.addEventListener('click', function (e) {
+        console.log(e.target);
+        if (e.target.tagName === 'A') {
+            nowId = e.target.dataset.id
+            render()
+        }
+    })
+    //文件夹添加事件
+    folders.addEventListener('click', function (e) {
+        console.log(e.target);
+        let item = ''
+        if (e.target.tagName === 'LI') {
+            item = e.target.tagName
+        } else if (e.target.tagName === 'IMG') {
+            item = e.target.tagName.parentNode
+        }
+        if (item) {
+            nowId = e.target.dataset.id
+            render()
+        }
+    })
+
 }
