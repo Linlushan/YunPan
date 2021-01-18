@@ -206,4 +206,39 @@
         }
         return `新建文件夹(${names.length + 1})`
     }
+    //右键菜单
+    //阻止系统默认行为
+    document.addEventListener('contextmenu', function (e) {
+
+        contextmenu.style.display = 'none'
+        e.preventDefault();
+
+    })
+    //右键添加事件
+    let contextmenu = document.querySelector('#contextmenu')
+    folders.addEventListener('contextmenu', function (e) {
+        let folder = null
+
+        if (e.target.tagName == 'LI') {
+            folder = e.target
+        } else if (e.target.parentNode.tagName == 'LI') {
+            folder = e.target.parentNode
+
+        }
+        if (folder) {
+            contextmenu.style.display = 'block'
+            e.stopPropagation()
+            e.preventDefault()
+            let x = e.clientX
+            let y = e.clientY
+            let maxX = window.innerWidth - contextmenu.offsetWidth
+            x = Math.min(x, maxX)
+            let maxY = window.innerHeight - contextmenu.offsetHeight
+            y = Math.min(y, maxY)
+            contextmenu.style.left = x + 'px'
+            contextmenu.style.top = y + 'px'
+
+        }
+        console.log(folder);
+    })
 }
