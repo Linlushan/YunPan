@@ -42,9 +42,29 @@
         breadNav.innerHTML = reanderBreadMenu()
         folders.innerHTML = reanderFolders()
     }
+    //弹窗公共方法
+    //成功弹窗
+    function alertSuccess(info) {
+        let succ = document.querySelector('.alert-success')
+        clearTimeout(succ.timer)
+        succ.classList.add('alert-show')
+        succ.innerHTML = info
+        succ.timer = setTimeout(() => {
+            succ.classList.remove('alert-show')
+        }, 1000)
+    }
+    //失败弹窗
+    function alertWarning(info) {
+        let warning = document.querySelector('.alert-warning')
+        clearTimeout(warning.timer)
+        warning.classList.add('alert-show')
+        warning.innerHTML = info
+        warning.timer = setTimeout(() => {
+            warning.classList.remove('alert-show')
+        }, 1000)
+    }
 
     //树状菜单的渲染
-
     function renderTreeMenu(pid, level) {
         let child = getChild(pid);
         let nowAllParent = getAllParent(nowId);
@@ -84,7 +104,6 @@
     }
 
     //文件夹视图渲染
-
     function reanderFolders() {
         let child = getChild(nowId)
         let inner = ''
@@ -148,6 +167,7 @@
                 title: getName()
             })
         render()
+        alertSuccess('新建文件夹成功')
     })
     //获取新建文件名字
     function getName() {
