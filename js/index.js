@@ -145,8 +145,45 @@
             {
                 id: Date.now(),
                 pid: nowId,
-                title: "新建文件夹"
+                title: getName()
             })
-            render()
-    })  
+        render()
+    })
+    //获取新建文件名字
+    function getName() {
+        let chlid = getChild(nowId)
+        let names = chlid.map(item => item.title)
+        //过滤获取符合名字的title
+        names = names.filter(item => {
+            if (item === '新建文件夹') {
+                return true
+            }
+            if (
+                item.substring(0, 6) === '新建文件夹('
+                && Number(item.substring(6, item.length - 1)) >= 2
+                && item[item.length - 1] === ')'
+            ) {
+                return true
+            }
+            return false
+        })
+        names.sort((n1, n2) => {
+            n1 = n1.substring(6, n1.length - 1)
+            n2 = n2.substring(6, n2.length - 1)
+            n1 = isNaN(n1) ? 0 : n1
+            n2 = isNaN(n2) ? 0 : n2
+            return n1 - n2
+        })
+        //判断第0位是否是 新建文件夹
+        if (names[0] !== '新建文件夹') {
+            return '新建文件夹'
+        }
+        for (let i = 1; i < names.length; i++) {
+            if (Number(names[i].substring(6, names[i].length - 1)) !== i + 1) {
+                return `新建文件(${names.length + 1})`
+            }
+
+        }
+        return `新建文件夹(${names.length + 1})`
+    }
 }
