@@ -275,9 +275,15 @@
     })
     contextmenu.addEventListener('click', function (e) {
         if (e.target.classList.contains('icon-lajitong')) {//右键菜单(删除)
-            console.log('删除', this.folder);
-            removeData(this.folder.dataset.id)
-            render()
+            confirm('确定要删除吗', () => {
+                console.log('点击确定了');
+                removeData(this.folder.dataset.id)
+                render()
+                alertSuccess('删除文件夹成功')
+            }, () => {
+                console.log('点击取消了');
+            })
+
         } else if (e.target.classList.contains('icon-yidong')) {//右键菜单(移动到)
             console.log('移动到');
         } else if (e.target.classList.contains('icon-zhongmingming')) {//右键菜单(重命名)
@@ -292,11 +298,7 @@
     let mask = document.querySelector('#mask')
     let confirmBtns = confirmEl.querySelectorAll('.confirm-btns a')
 
-    confirm('确定要删除吗', () => {
-        console.log('点击确定了');
-    }, () => {
-        console.log('点击取消了');
-    })
+
     function confirm(info, res, rej) {
         confirmText.innerHTML = info
         confirmEl.classList.add('confirm-show')
