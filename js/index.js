@@ -29,6 +29,11 @@
         }
         return allParent
     }
+    //根据id和newId修改数据位置（移动位置）
+    function moveData(id, newId) {
+        let selfData = getSelf(id)
+        selfData.pid = newId
+    }
 
     //视图渲染
     let treeMenu = document.querySelector('#tree-menu')
@@ -86,7 +91,7 @@
     }
 
     //树状菜单的渲染
-    function renderTreeMenu(pid, level) {
+    function renderTreeMenu(pid, level, isOpen) {
         let child = getChild(pid);
         let nowAllParent = getAllParent(nowId);
         nowAllParent.push(getSelf(nowId));
@@ -95,7 +100,7 @@
             ${child.map(item => {
             let itemChild = getChild(item.id);
             return `
-                    <li class="${nowAllParent.includes(item) ? "open" : ""}">
+                    <li class="${(nowAllParent.includes(item) || isOpen) ? "open" : ""}">
                         <p 
                             style="padding-left:${40 + level * 20}px" 
                             class="${itemChild.length ? "has-child" : ""} ${item.id == nowId ? "active" : ""}"
@@ -103,7 +108,7 @@
                         >
                             <span>${item.title}</span>
                         </p>
-                        ${itemChild.length ? renderTreeMenu(item.id, level + 1) : ""}
+                        ${itemChild.length ? renderTreeMenu(item.id, level + 1, isOpen) : ""}
                     </li>
                 `
         }).join("")}
@@ -267,7 +272,7 @@
             contextmenu.folder = folder
 
         }
-        console.log(folder);
+        // console.log(folder);
     })
     //右键菜单单项处理
     contextmenu.addEventListener('mousedown', function (e) {
@@ -277,7 +282,7 @@
         if (e.target.classList.contains('icon-lajitong')) {//右键菜单(删除)
             confirm('确定要删除吗', () => {
                 console.log('点击确定了');
-                removeData(this.folder.dataset.id)
+                removeData(Number(this.folder.dataset.id))
                 render()
                 alertSuccess('删除文件夹成功')
             }, () => {
@@ -285,7 +290,27 @@
             })
 
         } else if (e.target.classList.contains('icon-yidong')) {//右键菜单(移动到)
-            console.log('移动到');
+            // console.log('移动到');
+            let id = Number(this.folder.dataset.id)
+            let nowPid = getSelf(id).pid
+            moveAlert(() => {
+                if (newPid === null || nowPid == newPid) {
+                    alertWarning('您并没有任何移动')
+                    return false
+                }
+                let allChild = getAllChild(id)
+                let newParent = getSelf(newPid)
+                allChild.push(getSelf(id))
+                if (allChild.includes(newParent)) {
+                    alertWarning('不能把文件移动到它的子级里面')
+                    return false
+                }
+                moveData(id, newPid)
+                nowId = newPid
+                render()
+                alertSuccess('移动成功')
+                return true
+            })
         } else if (e.target.classList.contains('icon-zhongmingming')) {//右键菜单(重命名)
             console.log('重命名');
         }
@@ -319,4 +344,53 @@
         mask.style.display = 'none'
         confirmEl.classList.remove('confirm-show')
     })
+
+    //移动单项的弹窗
+    let moveAlertEl = document.querySelector('.move-alert')
+    let closMoveAlert = moveAlertEl.querySelector('.clos')
+    let moveAlertBtns = moveAlertEl.querySelectorAll('.confirm-btns a')
+    let moveAlertTreeMenu = moveAlertEl.querySelector('.move-alert-menu ')
+    let newPid = null
+    moveAlertTreeMenu.addEventListener('click', (e) => {
+        let item = ''
+        item = e.target.tagName == 'SPAN' ? e.target.parentNode : e.target
+
+        if (item.tagName == 'P') {
+            let p = moveAlertTreeMenu.querySelectorAll('p')
+            p.forEach(item => {
+                item.classList.remove('active')
+            })
+            item.classList.add('active')
+            newPid = item.dataset.id
+        }
+    })
+    closMoveAlert.onclick = function () {
+        moveAlertEl.classList.remove('move-alert-show')
+        mask.style.display = 'none'
+    }
+    function moveAlert(res, rej) {
+        moveAlertTreeMenu.innerHTML = renderTreeMenu(topPid, 0, true)
+        moveAlertEl.classList.add('move-alert-show')
+        mask.style.display = 'block'
+        newPid = null
+        moveAlertBtns[0].onclick = function () {
+            if (res) {
+                if (res()) {
+                    moveAlertEl.classList.remove('move-alert-show')
+                    mask.style.display = 'none'
+                }
+            } else {
+                moveAlertEl.classList.remove('move-alert-show')
+                mask.style.display = 'none'
+            }
+
+
+        }
+        moveAlertBtns[1].onclick = function () {
+            rej && rej()
+            moveAlertEl.classList.remove('move-alert-show')
+            mask.style.display = 'none'
+        }
+
+    }
 }
