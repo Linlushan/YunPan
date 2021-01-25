@@ -34,6 +34,11 @@
         let selfData = getSelf(id)
         selfData.pid = newId
     }
+    //检查id 下的子元素是否与newName重名
+    function testName(id, newName) {
+        let child = getChild(id)
+        return child.some(item => item.title == newName)
+    }
 
     //视图渲染
     let treeMenu = document.querySelector('#tree-menu')
@@ -303,6 +308,10 @@
                 allChild.push(getSelf(id))
                 if (allChild.includes(newParent)) {
                     alertWarning('不能把文件移动到它的子级里面')
+                    return false
+                }
+                if (testName(newPid,getSelf(id).title)) {
+                    alertWarning('命名重复了')
                     return false
                 }
                 moveData(id, newPid)
