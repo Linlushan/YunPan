@@ -39,6 +39,11 @@
         let child = getChild(id)
         return child.some(item => item.title == newName)
     }
+    //元素选中或者不选中
+    function changeChecked(id, checked) {
+        let selfData = getSelf(id)
+        selfData.checked = checked
+    }
 
     //视图渲染
     let treeMenu = document.querySelector('#tree-menu')
@@ -140,12 +145,12 @@
         let inner = ''
         child.forEach(item => {
             inner += `
-                <li data-id='${item.id}' class="folder-item">
+                <li data-id='${item.id}' class="folder-item ${item.checked ? 'active' : ''}">
                     <img src="img/folder-b.png" alt="">
                     <span class="folder-name">${item.title}</span>
                     <input type="text" class="editor" value="${item.title}">
                     <label class="checked">
-                        <input type="checkbox" />
+                        <input type="checkbox" ${item.checked ? 'checked' : ''}/>
                         <span class="iconfont icon-checkbox-checked"></span>
                     </label>   
                 </li>
@@ -161,6 +166,9 @@
         item = e.target.tagName == 'SPAN' ? e.target.parentNode : e.target
         if (item.tagName == 'P') {
             console.log(item.dataset.id);
+            data.forEach(item => {
+                delete item.checked
+            })
             nowId = item.dataset.id
             render()
         }
@@ -171,7 +179,40 @@
         console.log(e.target);
         if (e.target.tagName === 'A') {
             nowId = e.target.dataset.id
+            data.forEach(item => {
+                delete item.checked
+            })
             render()
+        }
+    })
+
+
+
+    //文件夹添加事件
+    folders.addEventListener('click', function (e) {
+        console.log(e.target);
+        let item = ''
+        if (e.target.tagName === 'LI') {
+            item = e.target.tagName
+        } else if (e.target.tagName === 'IMG') {
+            item = e.target.tagName.parentNode
+        }
+        if (item) {
+            nowId = e.target.dataset.id
+            data.forEach(item => {
+                delete item.checked
+            })
+            render()
+        }
+    })
+    //文件夹选中   
+    folders.addEventListener('change', (e) => {
+        // console.log(e.target.type);
+        if (e.target.type === 'checkbox') {
+            let id = e.target.parentNode.parentNode.dataset.id
+            changeChecked(id, e.target.checked)
+            console.log(data);
+            folders.innerHTML = reanderFolders()
         }
     })
 
@@ -206,20 +247,6 @@
         }
     }
 
-    //文件夹添加事件
-    folders.addEventListener('click', function (e) {
-        console.log(e.target);
-        let item = ''
-        if (e.target.tagName === 'LI') {
-            item = e.target.tagName
-        } else if (e.target.tagName === 'IMG') {
-            item = e.target.tagName.parentNode
-        }
-        if (item) {
-            nowId = e.target.dataset.id
-            render()
-        }
-    })
     //新建文件夹
     let createBtn = document.querySelector('.create-btn')
     createBtn.addEventListener('click', function () {
