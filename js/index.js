@@ -174,6 +174,38 @@
             render()
         }
     })
+
+    //重命名
+    function reName(folder) {
+        let folderName = folder.querySelector('.folder-name')
+        let editor = folder.querySelector('.editor')
+        folderName.style.display = 'none'
+        editor.style.display = 'block'
+        editor.select()
+        editor.onblur = function () {
+            if (editor.value === folderName.innerHTML) {
+                folderName.style.display = 'block'
+                editor.style.display = 'none'
+                return
+            }
+            if (!editor.value.trim()) {
+                alertWarning('请输入新名字')
+                editor.focus()
+                return
+            }
+            if (testName(nowId, editor.value)) {
+                alertWarning('名字重复了')
+                editor.focus()
+                return
+            }
+            folderName.style.display = 'block'
+            editor.style.display = 'none'
+            getSelf(folder.dataset.id).title = editor.value
+            render()
+            alertSuccess('重名名成功')
+        }
+    }
+
     //文件夹添加事件
     folders.addEventListener('click', function (e) {
         console.log(e.target);
@@ -310,7 +342,7 @@
                     alertWarning('不能把文件移动到它的子级里面')
                     return false
                 }
-                if (testName(newPid,getSelf(id).title)) {
+                if (testName(newPid, getSelf(id).title)) {
                     alertWarning('命名重复了')
                     return false
                 }
@@ -321,10 +353,12 @@
                 return true
             })
         } else if (e.target.classList.contains('icon-zhongmingming')) {//右键菜单(重命名)
-            console.log('重命名');
+            console.log(this.folder);
+            reName(this.folder)
         }
         contextmenu.style.display = 'none'
     })
+
     //  confirm 控件弹窗
     let confirmEl = document.querySelector('.confirm')
     let confirmText = document.querySelector('.confirm-text')
